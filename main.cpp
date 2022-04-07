@@ -7,22 +7,23 @@ using namespace std;
 namespace fs = filesystem;
 
 int solve(int n, vector<int> values, vector<int> weights, int W) {
-    vector<vector<int>> memo(n+1, vector<int>(W+1));
-    for (int i = 0; i <= W; i++) {
-        memo[0][i] = 0;
-    }
+    vector<int> memo1(W+1, 0);
+    vector<int> memo2(W+1, 0);
     for (int i = 1; i <= n; i++) {
+        vector<int> temp = memo1;
+        memo1 = memo2;
+        memo2 = temp;
         for (int j = 0; j <= W; j++) {
-            memo[i][j] = memo[i-1][j];
+            memo2[j] = memo1[j];
             if (j - weights[i - 1] >= 0) {
-                memo[i][j] = max(memo[i][j], memo[i-1][j - weights[i-1]] + values[i-1]);
+                memo2[j] = max(memo2[j], memo1[j - weights[i-1]] + values[i-1]);
             }
         }
     }
     int result = 0;
     for (int i = W; i >= 0; i--) {
-        if(memo[n][i] != 0) {
-            result = memo[n][i];
+        if(memo2[i] != 0) {
+            result = memo2[i];
             break;
         }
     }
@@ -40,6 +41,7 @@ int main() {
     for (auto& p : array_path) {
         ifstream fin;
         fin.open(p.string());
+        cout << p.string() << endl;
         int n, W;
         fin >> n >> W;
         vector<int> values;
